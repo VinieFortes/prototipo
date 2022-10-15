@@ -24,9 +24,9 @@
             </template>
           </q-file>
         </q-card-section>
-        <q-card-section>
+        <q-card-section v-if="showTable">
+          <q-btn class="q-mb-sm" icon="download" @click="downloadXLSX(xslxJson)" label="Baixar .xlsx gerado"></q-btn>
           <q-table
-            v-if="showTable"
             style="max-width: 800px"
             :rows="rows"
             title="Formato tabela"
@@ -56,9 +56,17 @@
 
 <script>
 import readXlsxFile from 'read-excel-file'
+const XLSX = require('xlsx');
 export default {
   name: "App1",
   methods: {
+    downloadXLSX(file){
+      const workSheet = XLSX.utils.json_to_sheet(file);
+      const workBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workBook, workSheet, 'Tabela Gerada');
+      XLSX.writeFile(workBook, 'tabela_gerada.xlsx');
+    },
+
     createTable(rows){
       const rowList = [];
       let rowObj = {};
@@ -74,8 +82,6 @@ export default {
         this.rows.push(rowObj)
         rowObj = {};
       }
-
-      console.log(this.rows)
       this.showTable = true;
     },
 
